@@ -1,0 +1,40 @@
+Gif to Video
+
+The Goal of this project is to create a web page that will allow 
+the user to upload an animated gif and choose a target from one 
+of the gifs frames. The target will be the image used for image 
+recognition and experience loading purposes.
+
+Once the user has specified a target, and a framerate the 
+program will convert the gif into an mp4 file and allow the user
+to download a zip file containing the target and the mp4 file.
+
+
+I am using python to write this program. 
+In order for it to work you need to install
+ImageMagick
+
+
+In order to split the gif up into it's components to allow the 
+user to choose a target and subset of images. I run the
+gif through PIL. I've written a function called gif_iter
+which iteriates through the gif. 
+
+
+In order to convert a series of images into an mp4 I use the following ffmpeg command:
+			ffmpeg  -f 12 -i a%d.gif -s 640x360 -vcodec libx264 a.avi
+
+
+
+Image Magick: Convert gif to individual images
+						convert a.gif -coalesce animate_%d.gif
+
+
+In order to get the number of frames in a gif.
+I run the following command in python
+a = check_output(['convert', 'a.gif[-1]', '-format', '"%[scene]"', 'info:'])
+
+i = int(re.findall('\d+',a)[0])
+
+print i
+
