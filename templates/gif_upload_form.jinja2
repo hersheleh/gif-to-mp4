@@ -2,11 +2,16 @@
 
 {% block content %}
 
-<form action="/uploaded_gif" method="post" enctype="multipart/form-data">
-		{# <label for="gif">UPLOAD GIF</label> #}
-		<label for="gif">UPLOAD</label>
-		<input id="gif" name="gif" type="file" accept=".gif,/image/*"/>
-		<input class="btn btn-primary" type="submit" value="UPLOAD"/>
-</form>
+		<div class="lead">
+				{# Convert a GIF image into augmented reality assets #}
+				BYOB
+		</div>
+
+		<form action="/uploaded_gif" method="post" enctype="multipart/form-data">
+				{# <label for="gif">UPLOAD GIF</label> #}
+				<label for="gif">UPLOAD</label>
+				<input id="gif" name="gif" type="file" accept=".gif,/image/*"/>
+				<input class="btn btn-primary" type="submit" value="UPLOAD"/>
+		</form>
 
 {% endblock %}

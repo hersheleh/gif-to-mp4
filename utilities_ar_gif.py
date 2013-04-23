@@ -15,7 +15,7 @@ def split_gif(gif_filename):
     
     basename = gif_filename.split('.')[0]
 
-    split_gif_dir = os.path.join('data', basename+"_frames")
+    split_gif_dir = os.path.join('data', basename)
 
 
     if not os.path.exists(split_gif_dir):
@@ -30,13 +30,15 @@ def split_gif(gif_filename):
 
     frame_count = int(re.findall('\d+', get_count)[0])
     
-    data = {'frame_count' : frame_count, 'gif_frame_path' : split_gif_dir }
+    data = {'frame_count' : frame_count, 'gif_frame_path' : split_gif_dir,
+            'file_basename': basename }
 
     return data
 
 
 def convert_gif_to_mp4():
     pass
+
 
 
 ######################################################################

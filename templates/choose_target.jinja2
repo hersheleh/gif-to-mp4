@@ -1,5 +1,24 @@
+{% extends "layout.jinja2" %}
+
 {% block content %}
-		
-		
+		<div class="span10 ">
+				<div class="lead pull-left">Choose a target</div>
+				<div class="btn btn-primary pull-right">Set Target</div>
+		</div>
+		<div class="row">		
+
+				<div class="span12">
+
+						{% for i in frame_count %}
+								
+								<div class="span2 border adjacent-table-cell">
+										<a href="#">
+												<img src=/{{ gif_dir }}/{{ file_basename }}{{ i }}.png />
+										</a>
+								</div>
+
+						{% endfor %}
+				</div>
+		</div>		
 
 {% endblock content %}

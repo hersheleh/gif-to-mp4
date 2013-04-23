@@ -1,0 +1,15 @@
+
+.border {
+    border: 2px solid #dddddd;
+				padding:1%;
+}
+
+.adjacent-table-cell {
+    margin-right:-0.2%;
+				margin-left:0px;
+				margin-bottom:-2px;
+}
+
+.border:hover {
+    background-color:red;
+}
