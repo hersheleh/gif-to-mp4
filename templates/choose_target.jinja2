@@ -3,7 +3,9 @@
 {% block content %}
 		<div class="span10 ">
 				<div class="lead pull-left">Choose a target</div>
-				<div class="btn btn-primary pull-right">Set Target</div>
+				<div class="btn btn-primary pull-right disabled set_target">
+						Set Target
+				</div>
 		</div>
 		<div class="row">		
 
@@ -12,7 +14,8 @@
 						{% for i in frame_count %}
 								
 								<div class="span2 border adjacent-table-cell">
-										<a href="#">
+										<a href="#" class="frame" data-frame={{ i }} 
+												data-basename={{ file_basename }}>
 												<img src=/{{ gif_dir }}/{{ file_basename }}{{ i }}.png />
 										</a>
 								</div>

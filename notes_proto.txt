@@ -38,3 +38,18 @@ i = int(re.findall('\d+',a)[0])
 
 print i
 
+In python to get a list of the current directory you use
+
+			import os
+			a =	os.listdir(".") # the dot indicates the current directory
+
+The above list will be out of order so we must do the following
+to sort the list. Since we are using basename number filename schema
+the following sort will work
+			sorted(a, key=lambda b: int(re.findall('\d+',b)[0]))
+
+To rename the new files we use the following function
+
+ 		os.mkdir('new')
+    for index,value in enumerate(b):
+				     os.rename(value, 'new/a%d.png'% index)

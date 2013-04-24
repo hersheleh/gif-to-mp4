@@ -1,6 +1,7 @@
 import os
 import uuid
 import json
+import re
 from utilities_ar_gif import split_gif
 
 from wsgiref.simple_server import make_server
@@ -32,8 +33,6 @@ def handle_uploaded_gif_file(request):
     temp_file_path = file_path + '~'
     output_file = open(temp_file_path, 'wb')
     
-    # input_file.seek(0)
-
     while True:
         data = input_file.read(2<<16)
         if not data:
@@ -66,6 +65,33 @@ def display_gif_frames(request):
                               { 'frame_count':frame_count,
                                 'gif_dir':gif_dir,
                                 'file_basename':file_basename })
+
+
+@view_config(name="convert", request_method="GET")
+def convert(request):
+    target = int(request.GET['frame'])
+    basename = request.GET['basename']
+
+
+
+    gif_dir = os.listdir(os.path.join("data", basename))
+    gif_dir = sorted(gif_dir, key=lambda frame: int(re.findall('\d+', frame)[0]))
+
+    gif_dir_a = gif_dir[:target]
+    gif_dir_b = gif_dir[target:]
+    gif_dir = gif_dir_b+gif_dir_a
+    print gif_dir
+
+    new_dir = basename+'_new'    
+    os.mkdir(os.path.join('data',new_dir))
+
+    for index, value in enumerate(gif_dir):
+        os.rename(os.path.join('data', basename, value), 
+                  'data/%s/%s%d.png' % (new_dir, basename, index) )
+        
+    os.rmdir(os.path.join('data', basename))
+
+    return Response('OK')
     
 
 
