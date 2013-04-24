@@ -2,7 +2,7 @@ import os
 import uuid
 import json
 import re
-from utilities_ar_gif import split_gif
+from utilities_ar_gif import split_gif, convert_frames_to_mp4
 
 from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
@@ -72,15 +72,12 @@ def convert(request):
     target = int(request.GET['frame'])
     basename = request.GET['basename']
 
-
-
     gif_dir = os.listdir(os.path.join("data", basename))
     gif_dir = sorted(gif_dir, key=lambda frame: int(re.findall('\d+', frame)[0]))
 
     gif_dir_a = gif_dir[:target]
     gif_dir_b = gif_dir[target:]
     gif_dir = gif_dir_b+gif_dir_a
-    print gif_dir
 
     new_dir = basename+'_new'    
     os.mkdir(os.path.join('data',new_dir))
@@ -90,6 +87,8 @@ def convert(request):
                   'data/%s/%s%d.png' % (new_dir, basename, index) )
         
     os.rmdir(os.path.join('data', basename))
+
+    convert_frames_to_mp4(new_dir, basename)
 
     return Response('OK')
     

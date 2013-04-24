@@ -36,9 +36,12 @@ def split_gif(gif_filename):
     return data
 
 
-def convert_gif_to_mp4():
-    pass
-
+def convert_frames_to_mp4(path, basename):
+    
+    call(['ffmpeg', '-f', '12', '-i', path+basename+'%d.png', 
+          '-s', '640x360', '-vcodec' ,'libx264' 'data/'+basename+'.avi'])
+    
+    return path+basename+'.avi'
 
 
 ######################################################################

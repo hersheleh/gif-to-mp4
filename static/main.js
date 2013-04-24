@@ -14,7 +14,7 @@ $(document).ready(function() {
 																			{ frame : frame,
 																					basename : basename
 																			}).done(function() {
-																							alert('done');
+																							window.location="/home";
 																			});
 								}
 				});
