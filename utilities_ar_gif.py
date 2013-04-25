@@ -42,6 +42,7 @@ def split_gif_into_frames(path_to_gif_file):
 
 
 
+
 # Takes the frame number(target) of the frame which will be the target 
 # and a path to frame directory. renames the image files in the frame 
 # directory to make the given frame the new first frame
@@ -61,9 +62,12 @@ def change_frame_order(target, path_to_frame_directory):
 
     frame_directory = dir_list
 
+
     # sorts the directory by the digit after the underscore
-    # the sort lambda does a regex to match the patter _number
-    # 
+    # the sort lambda does a regex to match the pattern '_number'
+    # findall returns the list, so we take the result at index[0].
+    # We truncate the underscore(_) from the result and convert 
+    # the number string into an integer.
     frame_directory.sort(key=lambda frame: int(re.findall('_\d+', frame)[0][1:]))
     
     

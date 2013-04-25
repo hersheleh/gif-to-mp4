@@ -20,7 +20,6 @@ def home(request):
 
 
 
-
 @view_config(name="uploaded_gif", request_method="POST")
 def handle_uploaded_gif_file(request):
     
@@ -77,11 +76,9 @@ def display_frames(request):
 
 
 
+
 @view_config(name="convert", request_method="GET")
 def convert(request):
-    ''' 
-    This is what needs to happen
-    '''
     
     target = int(request.GET['frame'])
     basename = request.GET['basename']
@@ -102,9 +99,9 @@ def convert(request):
 @view_config(name='download', request_method='GET')
 def download(request):
     
-    z = request.GET['zip']
+    zip_file = request.GET['zip']
     
-    return render_to_response('download_zip.jinja2', { 'zip_file' : z })
+    return render_to_response('download_zip.jinja2', { 'zip_file' : zip_file })
 
 
 
