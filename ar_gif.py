@@ -2,8 +2,9 @@ import os
 import uuid
 import json
 import re
-from utilities_ar_gif import split_gif, convert_frames_to_mp4
 
+from zipfile import ZipFile
+from utilities_ar_gif import split_gif_into_frames, convert_frames_to_mp4, change_frame_order
 from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
 from pyramid.response import Response
@@ -19,20 +20,27 @@ def home(request):
 
 
 
+
 @view_config(name="uploaded_gif", request_method="POST")
 def handle_uploaded_gif_file(request):
-    filename = request.POST['gif'].filename
+    
+    uploaded_filename = request.POST['gif'].filename
 
     input_file = request.POST['gif'].file
 
+    new_filename = '%s.gif' % uuid.uuid4()
 
+    # creates the data directory to serve static data
     if not os.path.exists('data'):
         os.mkdir('data')
 
-    file_path = os.path.join('data/', '%s' % filename)
+    # creates a temporary file
+    # 
+    file_path = os.path.join('data/', new_filename)
     temp_file_path = file_path + '~'
     output_file = open(temp_file_path, 'wb')
     
+
     while True:
         data = input_file.read(2<<16)
         if not data:
@@ -43,7 +51,7 @@ def handle_uploaded_gif_file(request):
 
     os.rename(temp_file_path, file_path)
 
-    data = split_gif(filename)
+    data = split_gif_into_frames('data/'+new_filename)
     
     params = "?"
     for key in data.keys():
@@ -54,44 +62,49 @@ def handle_uploaded_gif_file(request):
 
 
 
+
 @view_config(name="display_frames", request_method='GET')
-def display_gif_frames(request):
+def display_frames(request):
 
     frame_count = range(int(request.GET['frame_count']))
-    gif_dir = request.GET['gif_frame_path']
-    file_basename = request.GET['file_basename']
+    frame_path = request.GET['frame_path']
+    asset_name = request.GET['asset_name']
 
     return render_to_response('choose_target.jinja2',
                               { 'frame_count':frame_count,
-                                'gif_dir':gif_dir,
-                                'file_basename':file_basename })
+                                'frame_path':frame_path,
+                                'asset_name':asset_name })
+
 
 
 @view_config(name="convert", request_method="GET")
 def convert(request):
+    ''' 
+    This is what needs to happen
+    '''
+    
     target = int(request.GET['frame'])
     basename = request.GET['basename']
 
-    gif_dir = os.listdir(os.path.join("data", basename))
-    gif_dir = sorted(gif_dir, key=lambda frame: int(re.findall('\d+', frame)[0]))
+    change_frame_order(target, 'data/'+basename)
 
-    gif_dir_a = gif_dir[:target]
-    gif_dir_b = gif_dir[target:]
-    gif_dir = gif_dir_b+gif_dir_a
+    mp4_file = convert_frames_to_mp4('data/'+basename, basename)
+    target = os.path.join('data',basename,basename+"_0.png")
 
-    new_dir = basename+'_new'    
-    os.mkdir(os.path.join('data',new_dir))
-
-    for index, value in enumerate(gif_dir):
-        os.rename(os.path.join('data', basename, value), 
-                  'data/%s/%s%d.png' % (new_dir, basename, index) )
-        
-    os.rmdir(os.path.join('data', basename))
-
-    convert_frames_to_mp4(new_dir, basename)
-
-    return Response('OK')
+    zip_file = ZipFile('data/'+basename+'.zip', 'w')
+    zip_file.write('data/'+mp4_file, arcname=mp4_file)
+    zip_file.write(target, arcname=basename+'0.png')
     
+    return Response("/download/?zip=/data/"+basename+'.zip')
+    
+
+
+@view_config(name='download', request_method='GET')
+def download(request):
+    
+    z = request.GET['zip']
+    
+    return render_to_response('download_zip.jinja2', { 'zip_file' : z })
 
 
 
@@ -104,7 +117,8 @@ if __name__ == '__main__':
     config.add_static_view(name='static', path='./static')
     config.add_static_view(name='data', path='./data')
 
-    config.add_route('display_frames','/display_frames/{data}')    
+    config.add_route('display_frames','/display_frames')
+    config.add_route('download', '/download')
 
     config.scan()
     app = config.make_wsgi_app()

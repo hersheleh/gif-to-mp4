@@ -13,3 +13,11 @@
 .border:hover {
     background-color:blue;
 }
+
+.blue-background {
+				background-color:blue;
+}
+
+a:hover {
+    text-decoration:none;
+}

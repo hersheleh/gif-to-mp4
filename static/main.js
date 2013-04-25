@@ -2,7 +2,10 @@ $(document).ready(function() {
 
 				$('a.frame').click(function() {
 								$('a.frame').removeClass("target");
+								$('.border').removeClass('blue-background');
+
 								$(this).addClass("target");
+								$(this).parent().addClass('blue-background');
 								$('div.set_target').removeClass('disabled');
 				});
 
@@ -13,8 +16,8 @@ $(document).ready(function() {
 												$.get('/convert', 
 																			{ frame : frame,
 																					basename : basename
-																			}).done(function() {
-																							window.location="/home";
+																			}).done(function(data) {
+																							window.location = data;
 																			});
 								}
 				});
