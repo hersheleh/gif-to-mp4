@@ -19,7 +19,8 @@ def home(request):
     return render_to_response('gif_upload_form.jinja2', {})
 
 
-
+# This view handles an uploaded file
+# it expects the file posted to be called gif. 
 @view_config(name="uploaded_gif", request_method="POST")
 def handle_uploaded_gif_file(request):
     

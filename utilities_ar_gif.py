@@ -42,6 +42,39 @@ def split_gif_into_frames(path_to_gif_file):
 
 
 
+def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory):
+
+    frames = os.listdir(path_to_frame_directory)
+    '''
+    frames = os.listdir('data/6ca40f34-dab8-4d9b-8090-7a1558fbf412')
+    '''
+    # Deletes temporary files from the directory array
+    for item in frames:
+        if item.startswith("."):
+            frames.remove(item)
+
+    frames.sort(key=lambda frame: int(re.findall('_\d+', frame)[0][1:]))
+
+
+    frames_iter = []
+    frames_iter.extend(frames)
+
+    if (start_frame < end_frame):
+        subset = frames[start_frame:end_frame+1]
+        for frame in frames_iter:
+            if frame not in subset:
+                os.remove(os.path.join(path_to_frame_directory, frame))
+                frames.remove(frame)
+
+    elif(start_frame > end_frame):
+        subset = frames[end_frame+1:start_frame]
+        for frame in frames_iter:
+            if frame in subset:
+                os.remove(os.path.join(path_to_frame_directory, frame))
+                frames.remove(frame)
+            
+
+
 
 # Takes the frame number(target) of the frame which will be the target 
 # and a path to frame directory. renames the image files in the frame 
