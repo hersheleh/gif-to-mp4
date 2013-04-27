@@ -1,14 +1,26 @@
 {% extends "layout.jinja2" %}
 
-{% block content %}
-		<div class="span10 ">
-				<div class="lead pull-left">Choose a target</div>
-				<div class="btn btn-primary pull-right disabled set_target">
-						Set Target
-				</div>
-		</div>
-		<div class="row">		
 
+{% block content %}
+
+		<ul class="span10 nav nav-pills">
+				<li class="active choose-target">
+				<a class="lead" href="#">Choose a target</a>
+		</li>
+
+		<li class="choose-subset">
+				<a href="#" class="lead">Choose a subset</a>
+		</li>
+		<div class="span3 offset1 message" style="font-size:18px">
+				
+		</div>
+
+				<div class="btn btn-primary pull-right disabled convert">
+						Convert
+				</div>
+		</ul>
+
+		<div class="row">		
 				<div class="span12">
 
 						{% for i in frame_count %}

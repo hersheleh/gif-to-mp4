@@ -70,7 +70,7 @@ def display_frames(request):
     frame_path = request.GET['frame_path']
     asset_name = request.GET['asset_name']
 
-    return render_to_response('choose_target.jinja2',
+    return render_to_response('frames.jinja2',
                               { 'frame_count':frame_count,
                                 'frame_path':frame_path,
                                 'asset_name':asset_name })

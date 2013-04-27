@@ -10,11 +10,19 @@
 				margin-bottom:-2px;
 }
 
-.border:hover {
-    background-color:blue;
+.subset-hover {
+				background-color:black;
 }
 
-.blue-background {
+.subset-active {
+				background-color:black
+}
+
+.target-hover {
+				background-color:blue;
+}
+
+.target-active {
 				background-color:blue;
 }
 
