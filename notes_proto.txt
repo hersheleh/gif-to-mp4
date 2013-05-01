@@ -22,7 +22,7 @@ which iteriates through the gif.
 
 
 In order to convert a series of images into an mp4 I use the following ffmpeg command:
-			ffmpeg  -r 12 -i a%d.gif -s 640x360 -vcodec libx264 a.avi
+			ffmpeg  -r 12 -i a%d.png -s 640x360 -vcodec libx264 a.mp4
 
 
 

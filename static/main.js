@@ -3,7 +3,10 @@ $(document).ready(function() {
 				// select target is the default functionality
 				bind_select_target_functionality();
 
-				// When user clicks clear all
+				/* Clears subset progress
+							and unsets the active target
+							and any highlighted subset of frames
+					*/
 				$('.clear').click(
 								function() {
 												clear_all();
@@ -13,7 +16,10 @@ $(document).ready(function() {
 								});
 
 
-				// When user clicks Choose a target
+				/* Rebinds functionality on clicking 
+							frames so that user can select a 
+							target instead of a subset of frames
+					*/
 				$('.choose-target').click(function() {
 								$('.message').html('Select a Target Frame This will be your first frame');
 								$('li').removeClass('active');
@@ -22,23 +28,27 @@ $(document).ready(function() {
 								bind_select_target_functionality();
 				});
 
-				// When user clicks Choose a Subset
-				if (subset_progress != 2) {
-								$('.choose-subset').click(function() {
-												$('li').removeClass('active');
-												$(this).addClass('active');
-												unbind_all();
-												bind_select_subset_functionality();
+				/* On Page load when the user clicks the 
+							Choose a subset tab, it sets the tab
+							to active and rebinds all functionality 
+							related to clicking on frames so that
+							the user can select a subset instead of
+							a target		
+				*/
+				$('.choose-subset').click(function() {
+								$('li').removeClass('active');
+								$(this).addClass('active');
+								unbind_all();
+								bind_select_subset_functionality();
 
-												if (subset_progress == 1) {
-																$('.message').html('Select End Frame');
+								if (subset_progress == 1) {
+												$('.message').html('Select End Frame');
 
-												}
-												else {
-																$('.message').html('Select Start Frame')
-												}
-								});
-				}
+								}
+								else {
+												$('.message').html('Select Start Frame')
+								}
+				});
 });
 
 
@@ -100,8 +110,10 @@ function bind_select_target_functionality() {
 				
 }
 
-/*This variable tracks the progress
-		of the subset selection process */
+/*This variable tracks the progress	of the subset 
+		selection process 		0 is no selection 1 means 
+		you've selected the start frame		and 2 means 
+		you've selected the end frame              */
 var subset_progress = 0
 
 function bind_select_subset_functionality() {
@@ -125,27 +137,37 @@ function bind_select_subset_functionality() {
 																subset_progress = 1;
 												}
 												else if (subset_progress == 1) {
-																
+
 																var start_frame = $('.start-frame').data('frame');
+																var end_frame = $(this).children('.frame').data('frame');
+																var target = $('.target').data('frame');
+																
+																console.log(is_between(start_frame, end_frame, target));
+																
+																// If user clicks the same frame. It clears all subset data
+																if (start_frame == end_frame) {
+																				$('.message').html('Cleared Subset');
+																				$('.frame').removeClass('start_frame');
+																				$('.border').removeClass('subset-active');
+																				subset_progress = 0;
+																}
 
 																
-																$(this).addClass('subset-active');
-																$(this).children('.frame').addClass('end-frame');
-																
-																var end_frame = $('.end-frame').data('frame');
 
-																var frame_count = $('.frame-roll').data('frame_count');
+																else if ( is_between(start_frame, end_frame, target) || 
+																										!$('.target-active')[0])  {
+																				
+																				$(this).addClass('subset-active');
+																				$(this).children('.frame').addClass('end-frame');
+																				var frame_count = $('.frame-roll').data('frame_count');
+																				selected_frames_visualization(start_frame, end_frame, frame_count);
+																				subset_progress = 2
+																				$('.message').html('Click again to choose new start frame');
+																}
+																				
 																
-																selected_frames_visualization(start_frame, end_frame, frame_count);
-																
-																subset_progress = 2
-																$('.message').html('Click again to choose new start frame');
 												}
-												// If user clicks the same frame. It clears all subset data
-												else {
-																subset_progress = 0;
-																clear_all();
-												}
+
 
 								}
 				);
@@ -176,6 +198,7 @@ function clear_all() {
 				$('.frame').removeClass('start-frame');
 				$('.frame').removeClass('end-frame')
 				$('img').css('opacity',1);
+				subset_progress = 0;
 }
 
 function unbind_all() {
