@@ -142,8 +142,14 @@ def change_frame_order(target, path_to_frame_directory):
 
 def convert_frames_to_mp4(path, basename):
 
+    result = check_output(['identify', path+'/'+basename+'_0.png'])
+
+    # finds (length)x(width) pattern, takes the first result
+    # and replaces all whitespace with empty strings
+    image_size = re.findall(' \d+x\d+ ', result)[0].replace(' ', '')
+
     call(['ffmpeg','-y', '-r', '12', '-i', path+'/'+basename+'_%d.png',
-          '-s', '640x360', '-vcodec' ,'libx264', 'data/'+basename+'.mp4'])
+          '-s', image_size , '-vcodec' ,'libx264', 'data/'+basename+'.mp4'])
     
     return basename+'.mp4'
 
