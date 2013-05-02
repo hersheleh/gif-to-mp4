@@ -86,10 +86,10 @@ def convert_subset(request):
     start_frame = int(request.POST['start_frame'])
     end_frame = int(request.POST['end_frame'])
     
-    select_subset_of_frames(start_frame, end_frame,'data/'+basename)
+    new_target = select_subset_of_frames(start_frame, end_frame, 'data/'+basename, target)
 
 
-    return HTTPFound("/convert?frame=%s&basename=%s" % (target, basename) )
+    return HTTPFound("/convert?frame=%s&basename=%s" % (new_target, basename) )
 
 
 

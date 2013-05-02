@@ -42,12 +42,11 @@ def split_gif_into_frames(path_to_gif_file):
 
 
 
-def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory):
+def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory, target=None):
 
     frames = os.listdir(path_to_frame_directory)
-    '''
-    frames = os.listdir('data/6ca40f34-dab8-4d9b-8090-7a1558fbf412')
-    '''
+
+
     # Deletes temporary files from the directory array
     for item in frames:
         if item.startswith("."):
@@ -58,6 +57,8 @@ def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory):
 
     frames_iter = []
     frames_iter.extend(frames)
+
+    subset = []
 
     if (start_frame < end_frame):
         subset = frames[start_frame:end_frame+1]
@@ -72,7 +73,13 @@ def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory):
             if frame in subset:
                 os.remove(os.path.join(path_to_frame_directory, frame))
                 frames.remove(frame)
-            
+
+    if (target):
+        find_target = [frame for frame in subset if ('_%d' % target) in frame ]
+
+        new_target = subset.index(find_target[0])
+
+        return new_target
 
 
 
@@ -85,8 +92,11 @@ def change_frame_order(target, path_to_frame_directory):
     basename = os.path.basename(path_to_frame_directory)
     file_directory = os.path.dirname(path_to_frame_directory)
     
+
     # creates a list of all the files in the directory
     dir_list = os.listdir(path_to_frame_directory)
+
+
 
     # clears the file list of hidden files
     for item in dir_list:
@@ -102,7 +112,7 @@ def change_frame_order(target, path_to_frame_directory):
     # We truncate the underscore(_) from the result and convert 
     # the number string into an integer.
     frame_directory.sort(key=lambda frame: int(re.findall('_\d+', frame)[0][1:]))
-    
+
     
     # Splits the frame directory in two
     first_half = frame_directory[:target]
@@ -112,6 +122,7 @@ def change_frame_order(target, path_to_frame_directory):
     reordered_frames = last_half+first_half
     
     
+
     temp_dir = os.path.join(file_directory,basename+'_temp')
     
     if os.path.exists(temp_dir):
