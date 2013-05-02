@@ -1,29 +1,29 @@
 
 .border {
     border: 2px solid #dddddd;
-				padding:1%;
+	padding:1%;
 }
 
 .adjacent-table-cell {
     margin-right:-0.2%;
-				margin-left:0px;
-				margin-bottom:-2px;
+	margin-left:0px;
+	margin-bottom:-2px;
 }
 
 .subset-hover {
-				background-color:black;
+	background-color:black;
 }
 
 .subset-active {
-				background-color:black
+	background-color:black
 }
 
 .target-hover {
-				background-color:blue;
+	background-color:blue;
 }
 
 .target-active {
-				background-color:blue;
+	background-color:blue;
 }
 
 a:hover {

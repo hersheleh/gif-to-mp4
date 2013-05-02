@@ -4,7 +4,7 @@ import json
 import re
 
 from zipfile import ZipFile
-from utilities_ar_gif import split_gif_into_frames, convert_frames_to_mp4, change_frame_order
+from utilities_ar_gif import split_gif_into_frames, convert_frames_to_mp4, change_frame_order, select_subset_of_frames
 from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
 from pyramid.response import Response
@@ -35,7 +35,6 @@ def handle_uploaded_gif_file(request):
         os.mkdir('data')
 
     # creates a temporary file
-    # 
     file_path = os.path.join('data/', new_filename)
     temp_file_path = file_path + '~'
     output_file = open(temp_file_path, 'wb')
@@ -78,6 +77,22 @@ def display_frames(request):
 
 
 
+
+@view_config(name="subset", request_method="POST")
+def convert_subset(request):
+    
+    target = int(request.POST['frame'])
+    basename = request.POST['basename']
+    start_frame = int(request.POST['start_frame'])
+    end_frame = int(request.POST['end_frame'])
+    
+    select_subset_of_frames(start_frame, end_frame,'data/'+basename)
+
+
+    return HTTPFound("/convert?frame=%s&basename=%s" % (target, basename) )
+
+
+
 @view_config(name="convert", request_method="GET")
 def convert(request):
     
@@ -94,7 +109,7 @@ def convert(request):
     zip_file.write(target, arcname=basename+'0.png')
     
     return Response("/download/?zip=/data/"+basename+'.zip')
-    
+
 
 
 @view_config(name='download', request_method='GET')
