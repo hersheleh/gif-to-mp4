@@ -148,6 +148,16 @@ def convert_frames_to_mp4(path, basename):
     # and replaces all whitespace with empty strings
     image_size = re.findall(' \d+x\d+ ', result)[0].replace(' ', '')
 
+    image_size = image_size.split('x')
+    
+    # converts items in image_size list to integers
+    image_size = [int(dimension) for dimension in image_size]
+    
+    # turns all odd numbers to even in list
+    image_size = [ value - 1 if value % 2 != 0 else value for value in image_size]
+
+    image_size = "%dx%d" % (image_size[0], image_size[1])
+
     call(['ffmpeg','-y', '-r', '12', '-i', path+'/'+basename+'_%d.png',
           '-s', image_size , '-vcodec' ,'libx264', 'data/'+basename+'.mp4'])
     
