@@ -74,7 +74,8 @@ def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory, tar
                 os.remove(os.path.join(path_to_frame_directory, frame))
                 frames.remove(frame)
 
-    if (target):
+
+    if (target != None ):
         find_target = [frame for frame in subset if ('_%d' % target) in frame ]
 
         new_target = subset.index(find_target[0])
