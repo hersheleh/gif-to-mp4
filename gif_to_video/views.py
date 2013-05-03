@@ -2,22 +2,30 @@ import os
 import uuid
 import json
 import re
-
+import pkg_resources
 from zipfile import ZipFile
 from utilities_ar_gif import split_gif_into_frames, convert_frames_to_mp4, change_frame_order, select_subset_of_frames
-from wsgiref.simple_server import make_server
-from pyramid.config import Configurator
+
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
+
 from pyramid.httpexceptions import HTTPFound
 
+''' 
+These views handle stuff
+'''
 
+
+'''
+@view_config(route_name='home', renderer='templates/mytemplate.pt')
+def my_view(request):
+    return {'project': 'gif_to_video'}
+'''
 
 @view_config()
 def home(request):
     return render_to_response('gif_upload_form.jinja2', {})
-
 
 # This view handles an uploaded file
 # it expects the file posted to be called gif. 
@@ -31,11 +39,12 @@ def handle_uploaded_gif_file(request):
     new_filename = '%s.gif' % uuid.uuid4()
 
     # creates the data directory to serve static data
-    if not os.path.exists('data'):
-        os.mkdir('data')
+    data_path = pkg_resources.resource_filename('gif_to_video', 'data')
+    if not os.path.exists(data_path):
+        os.mkdir(data_path)
 
     # creates a temporary file
-    file_path = os.path.join('data/', new_filename)
+    file_path = os.path.join(data_path, new_filename)
     temp_file_path = file_path + '~'
     output_file = open(temp_file_path, 'wb')
     
@@ -50,15 +59,13 @@ def handle_uploaded_gif_file(request):
 
     os.rename(temp_file_path, file_path)
 
-    data = split_gif_into_frames('data/'+new_filename)
+    data = split_gif_into_frames(file_path)
     
     params = "?"
     for key in data.keys():
         params += key+"="+str(data[key])+"&"
-
         
     return HTTPFound('/display_frames/'+params)
-
 
 
 
@@ -66,15 +73,11 @@ def handle_uploaded_gif_file(request):
 def display_frames(request):
 
     frame_count = range(int(request.GET['frame_count']))
-    frame_path = request.GET['frame_path']
     asset_name = request.GET['asset_name']
 
     return render_to_response('frames.jinja2',
                               { 'frame_count':frame_count,
-                                'frame_path':frame_path,
                                 'asset_name':asset_name })
-
-
 
 
 
@@ -86,8 +89,11 @@ def convert_subset(request):
     start_frame = int(request.POST['start_frame'])
     end_frame = int(request.POST['end_frame'])
     
-    new_target = select_subset_of_frames(start_frame, end_frame, 'data/'+basename, target)
+    
+    data_path = pkg_resources.resource_filename('gif_to_video', 'data')
+    asset_path = os.path.join(data_path, basename)
 
+    new_target = select_subset_of_frames(start_frame, end_frame, asset_path, target)
 
     return HTTPFound("/convert?frame=%s&basename=%s" % (new_target, basename) )
 
@@ -99,13 +105,17 @@ def convert(request):
     target = int(request.GET['frame'])
     basename = request.GET['basename']
 
-    change_frame_order(target, 'data/'+basename)
 
-    mp4_file = convert_frames_to_mp4('data/'+basename, basename)
-    target = os.path.join('data',basename,basename+"_0.png")
+    data_path = pkg_resources.resource_filename('gif_to_video', 'data')
+    asset_path = os.path.join(data_path, basename)
 
-    zip_file = ZipFile('data/'+basename+'.zip', 'w')
-    zip_file.write('data/'+mp4_file, arcname=mp4_file)
+    change_frame_order(target, asset_path)
+
+    mp4_file = convert_frames_to_mp4(asset_path, basename)
+    target = os.path.join(asset_path, basename+"_0.png")
+
+    zip_file = ZipFile(asset_path+'.zip', 'w')
+    zip_file.write(os.path.join(data_path, mp4_file), arcname=mp4_file)
     zip_file.write(target, arcname=basename+'0.png')
     
     return Response("/download/?zip=/data/"+basename+'.zip')
@@ -119,22 +129,3 @@ def download(request):
     
     return render_to_response('download_zip.jinja2', { 'zip_file' : zip_file })
 
-
-
-if __name__ == '__main__':
-
-    config = Configurator()
-
-    config.include('pyramid_jinja2')
-    config.add_jinja2_search_path("ar_gif:templates")
-    config.add_static_view(name='static', path='./static')
-    config.add_static_view(name='data', path='./data')
-
-    config.add_route('display_frames','/display_frames')
-    config.add_route('download', '/download')
-
-    config.scan()
-    app = config.make_wsgi_app()
-    server = make_server('0.0.0.0', 8080, app)
-    server.serve_forever()
-    

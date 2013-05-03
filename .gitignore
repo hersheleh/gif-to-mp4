@@ -2,5 +2,5 @@
 *~
 *.pyc
 \#*#
-data/*
+gif_to_video/data
 test_files

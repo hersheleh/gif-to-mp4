@@ -1,5 +1,6 @@
 import os
 import re
+import pkg_resources
 from shutil import rmtree
 from subprocess import check_output, call
 
@@ -35,7 +36,7 @@ def split_gif_into_frames(path_to_gif_file):
     frame_count = int(re.findall('\d+', get_count)[0])
     
     # returns the frame_count, frame_path and asset_name
-    data = {'frame_count' : frame_count, 'frame_path' : output_directory,
+    data = {'frame_count' : frame_count,
             'asset_name': filename_without_extension }
 
     return data
@@ -46,14 +47,14 @@ def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory, tar
 
     frames = os.listdir(path_to_frame_directory)
 
-
     # Deletes temporary files from the directory array
     for item in frames:
         if item.startswith("."):
             frames.remove(item)
 
-    frames.sort(key=lambda frame: int(re.findall('_\d+', frame)[0][1:]))
+    print frames
 
+    frames.sort(key=lambda frame: int(re.findall('_\d+', frame)[0][1:]))
 
     frames_iter = []
     frames_iter.extend(frames)
@@ -143,7 +144,7 @@ def change_frame_order(target, path_to_frame_directory):
 
 def convert_frames_to_mp4(path, basename):
 
-    result = check_output(['identify', path+'/'+basename+'_0.png'])
+    result = check_output(['identify', os.path.join(path, basename+'_0.png')])
 
     # finds (length)x(width) pattern, takes the first result
     # and replaces all whitespace with empty strings
@@ -159,8 +160,8 @@ def convert_frames_to_mp4(path, basename):
 
     image_size = "%dx%d" % (image_size[0], image_size[1])
 
-    call(['ffmpeg','-y', '-r', '12', '-i', path+'/'+basename+'_%d.png',
-          '-s', image_size , '-vcodec' ,'libx264', 'data/'+basename+'.mp4'])
+    call(['ffmpeg','-y', '-r', '12', '-i', os.path.join(path, basename+'_%d.png'),
+          '-s', image_size , '-vcodec' ,'libx264', path+'.mp4'])
     
     return basename+'.mp4'
 
