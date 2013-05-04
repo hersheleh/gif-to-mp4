@@ -111,7 +111,7 @@ def convert(request):
 
     change_frame_order(target, asset_path)
 
-    mp4_file = convert_frames_to_mp4(asset_path, basename)
+    mp4_file = convert_frames_to_mp4(data_path, basename)
     target = os.path.join(asset_path, basename+"_0.png")
 
     zip_file = ZipFile(asset_path+'.zip', 'w')

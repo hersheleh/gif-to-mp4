@@ -144,7 +144,7 @@ def change_frame_order(target, path_to_frame_directory):
 
 def convert_frames_to_mp4(path, basename):
 
-    result = check_output(['identify', os.path.join(path, basename+'_0.png')])
+    result = check_output(['identify', os.path.join(path+'/'+basename, basename+'_0.png')])
 
     # finds (length)x(width) pattern, takes the first result
     # and replaces all whitespace with empty strings
@@ -160,8 +160,14 @@ def convert_frames_to_mp4(path, basename):
 
     image_size = "%dx%d" % (image_size[0], image_size[1])
 
-    call(['ffmpeg','-y', '-r', '12', '-i', os.path.join(path, basename+'_%d.png'),
-          '-s', image_size , '-vcodec' ,'libx264', path+'.mp4'])
+    print os.path.join(path+'/'+basename, basename+'_%d.png')
+
+    print os.listdir(os.path.join(path,basename))
+
+    print os.listdir(path)
+
+    call(['ffmpeg','-y', '-r', '12', '-i', os.path.join(path+'/'+basename, basename+'_%d.png'),
+          '-s', image_size , '-vcodec' ,'libx264', os.path.join(path, basename+'.mp4')])
     
     return basename+'.mp4'
 
