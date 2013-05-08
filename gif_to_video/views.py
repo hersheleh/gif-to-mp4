@@ -2,9 +2,10 @@ import os
 import uuid
 import json
 import re
-import pkg_resources
 from zipfile import ZipFile
 from utilities_ar_gif import split_gif_into_frames, convert_frames_to_mp4, change_frame_order, select_subset_of_frames
+
+from subprocess import call
 
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
@@ -39,7 +40,8 @@ def handle_uploaded_gif_file(request):
     new_filename = '%s.gif' % uuid.uuid4()
 
     # creates the data directory to serve static data
-    data_path = pkg_resources.resource_filename('gif_to_video', 'data')
+    data_path = request.registry.settings['upload_dir']
+
     if not os.path.exists(data_path):
         os.mkdir(data_path)
 
@@ -90,7 +92,7 @@ def convert_subset(request):
     end_frame = int(request.POST['end_frame'])
     
     
-    data_path = pkg_resources.resource_filename('gif_to_video', 'data')
+    data_path = request.registry.settings['upload_dir']
     asset_path = os.path.join(data_path, basename)
 
     new_target = select_subset_of_frames(start_frame, end_frame, asset_path, target)
@@ -106,17 +108,19 @@ def convert(request):
     basename = request.GET['basename']
 
 
-    data_path = pkg_resources.resource_filename('gif_to_video', 'data')
+    data_path = request.registry.settings['upload_dir']
     asset_path = os.path.join(data_path, basename)
 
     change_frame_order(target, asset_path)
 
     mp4_file = convert_frames_to_mp4(data_path, basename)
-    target = os.path.join(asset_path, basename+"_0.png")
+    
+    call(['convert', os.path.join(asset_path, basename+"_0.png"), asset_path+'.jpg'])
+    target = os.path.join(data_path, basename+'.jpg')
 
     zip_file = ZipFile(asset_path+'.zip', 'w')
     zip_file.write(os.path.join(data_path, mp4_file), arcname=mp4_file)
-    zip_file.write(target, arcname=basename+'0.png')
+    zip_file.write(target, arcname=basename+'.jpg')
     
     return Response("/download/?zip=/data/"+basename+'.zip')
 
