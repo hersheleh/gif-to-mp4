@@ -166,7 +166,7 @@ def convert_frames_to_mp4(path, basename):
 
     print os.listdir(path)
 
-    call(['ffmpeg','-y', '-r', '30000/1001','coder' '0' , '-i', os.path.join(path+'/'+basename, basename+'_%d.png'), '-s', image_size , '-vcodec' ,'libx264', os.path.join(path, basename+'.m4v')])
+    call(['ffmpeg','-y', '-r', '12' , '-i', os.path.join(path+'/'+basename, basename+'_%d.png'), '-s', image_size , '-vcodec' ,'libx264', os.path.join(path, basename+'.m4v')])
     
     return basename+'.m4v'
 
