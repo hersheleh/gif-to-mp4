@@ -33,7 +33,8 @@ def split_gif_into_frames(path_to_gif_file):
                               '"%[scene]"','info:'])
 
     # extracts and converts the frame count value from a string to an int
-    frame_count = int(re.findall('\d+', get_count)[0])
+    # The count calculated is an index, so we increment by one to get a count
+    frame_count = int(re.findall('\d+', get_count)[0]) + 1
     
     # returns the frame_count, frame_path and asset_name
     data = {'frame_count' : frame_count,
