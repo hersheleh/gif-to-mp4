@@ -1,8 +1,8 @@
 
 /*This variable tracks the progress	of the subset 
-  selection process 		0 is no selection 1 means 
-  you've selected the start frame		and 2 means 
-  you've selected the end frame              */
+  selection process 0 is no selection 1 means 
+  you've selected the start frame and 2 means 
+  you've selected the end frame             */
 
 var subset_progress = 0
 
@@ -147,8 +147,7 @@ function bind_select_subset_functionality() {
 					subset_progress = 0;
 				}
 
-				else if ( is_between(start_frame, end_frame, target) || 
-						  !$('.target')[0])  {
+				else if ( is_between(start_frame, end_frame, target) || !$('.target')[0])  {
 					
 					$(this).addClass('subset-active');
 					$(this).children('.frame').addClass('end-frame');
@@ -223,7 +222,6 @@ function bind_target_convert() {
 			$.get('/convert',
 				  { frame : frame,
 					basename : basename, 
-					data3 : "data3",
 				  }
 				 ).done(function(data) {
 					 window.location = data;
@@ -249,7 +247,7 @@ function clear_target() {
 
 function unbind_all() {
 	$('.border').unbind();
-	$('div.coonvert').unbind();
+	$('div.convert').unbind();
 	$('a.frame').unbind();
 }
 
@@ -257,24 +255,10 @@ function unbind_all() {
 function is_between(start_frame, end_frame, target) {
 	
 	if (start_frame < end_frame) {
-		if (start_frame <= target && target <= end_frame) {
-
-			return true
-		}
-		else {
-			return false
-		}
-	}
+		return (start_frame <= target && target <= end_frame)
+    }
 	else if (start_frame > end_frame) {
-		if (target >= start_frame) {
-			return true;
-		} 
-		else if ( target <= end_frame) {
-			return true;
-		}
-		else {
-			return false;
-		}
+        return (target >= start_frame || end_frame >= target)
 	}
 	else {
 		return false;

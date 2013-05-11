@@ -1,6 +1,6 @@
 import os
 import re
-import pkg_resources
+# import pkg_resources
 from shutil import rmtree
 from subprocess import check_output, call
 
@@ -29,13 +29,15 @@ def split_gif_into_frames(path_to_gif_file):
 
     
     # calculates the number of frames in a gif using imagemagick
-    get_count = check_output(['convert', path_to_gif_file+'[-1]', '-format', 
-                              '"%[scene]"','info:'])
+    count_result = check_output(['convert', path_to_gif_file+'[-1]', '-format', 
+                                 '"%[scene]"','info:'])
 
+    # count_result example: '"30"\n'
     # extracts and converts the frame count value from a string to an int
     # The count calculated is an index, so we increment by one to get a count
-    frame_count = int(re.findall('\d+', get_count)[0]) + 1
+    frame_count = int(re.findall('\d+', count_result)[0]) + 1
     
+
     # returns the frame_count, frame_path and asset_name
     data = {'frame_count' : frame_count,
             'asset_name': filename_without_extension }
@@ -46,6 +48,8 @@ def split_gif_into_frames(path_to_gif_file):
 
 def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory, target=None):
 
+    basename = os.path.basename(path_to_frame_directory)
+
     frames = os.listdir(path_to_frame_directory)
 
     # Deletes temporary files from the directory array
@@ -53,8 +57,7 @@ def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory, tar
         if item.startswith("."):
             frames.remove(item)
 
-    print frames
-
+    # Sample filename 07c15-39f70_0.png
     frames.sort(key=lambda frame: int(re.findall('_\d+', frame)[0][1:]))
 
     frames_iter = []
@@ -62,6 +65,7 @@ def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory, tar
 
     subset = []
 
+    # Remove all frames that *are not* between the start frame and the end frame
     if (start_frame < end_frame):
         subset = frames[start_frame:end_frame+1]
         for frame in frames_iter:
@@ -69,6 +73,8 @@ def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory, tar
                 os.remove(os.path.join(path_to_frame_directory, frame))
                 frames.remove(frame)
 
+    # Remove all frames that *are* between the end frame and the start frame
+    #  (since we're wrapping)
     elif(start_frame > end_frame):
         subset = frames[end_frame+1:start_frame]
         for frame in frames_iter:
@@ -76,11 +82,12 @@ def select_subset_of_frames(start_frame, end_frame, path_to_frame_directory, tar
                 os.remove(os.path.join(path_to_frame_directory, frame))
                 frames.remove(frame)
 
-
+                
+    # If a target parameter is specified, we set a new target 
+    # the new target is the index of old target
     if (target != None ):
-        find_target = [frame for frame in subset if ('_%d' % target) in frame ]
-
-        new_target = subset.index(find_target[0])
+        
+        new_target = subset.index('%s_%d.png' % (basename, target))
 
         return new_target
 
@@ -100,7 +107,6 @@ def change_frame_order(target, path_to_frame_directory):
     dir_list = os.listdir(path_to_frame_directory)
 
 
-
     # clears the file list of hidden files
     for item in dir_list:
         if item.startswith("."):
@@ -117,16 +123,14 @@ def change_frame_order(target, path_to_frame_directory):
     frame_directory.sort(key=lambda frame: int(re.findall('_\d+', frame)[0][1:]))
 
     
-    # Splits the frame directory in two
+    # Splits the frame directory in two, based on target index
     first_half = frame_directory[:target]
     last_half = frame_directory[target:]
 
     # adds all frames behind the target to the end of the directory list
     reordered_frames = last_half+first_half
-    
-    
 
-    temp_dir = os.path.join(file_directory,basename+'_temp')
+    temp_dir = os.path.join(file_directory, basename+'_temp')
     
     if os.path.exists(temp_dir):
         rmtree(temp_dir)
@@ -159,7 +163,12 @@ def convert_frames_to_mp4(path, basename):
     image_size = "%dx%d" % (image_size[0], image_size[1])
     '''
 
-    call(['ffmpeg','-y', '-r', '12' , '-vf' , "scale='640:trunc(ow/a/2)*2'", '-i', os.path.join(path+'/'+basename, basename+'_%d.png'), '-vcodec' ,'libx264', os.path.join(path, basename+'.m4v')])
+    call([ 'ffmpeg','-y', '-r', '12' , 
+           '-i', os.path.join(path+'/'+basename, basename+'_%d.png'), 
+           '-vf' , "scale='640:trunc(ow/a/2)*2'", 
+           '-vcodec' ,'libx264', 
+           os.path.join(path, basename+'.m4v')
+           ])
     
     return basename+'.m4v'
 

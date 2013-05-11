@@ -14,19 +14,15 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
 ''' 
-These views handle stuff
+put comment here
 '''
 
 
-'''
-@view_config(route_name='home', renderer='templates/mytemplate.pt')
-def my_view(request):
-    return {'project': 'gif_to_video'}
-'''
 
 @view_config()
 def home(request):
     return render_to_response('gif_upload_form.jinja2', {})
+
 
 # This view handles an uploaded file
 # it expects the file posted to be called gif. 
@@ -97,6 +93,7 @@ def convert_subset(request):
 
     new_target = select_subset_of_frames(start_frame, end_frame, asset_path, target)
 
+    
     return HTTPFound("/convert?frame=%s&basename=%s" % (new_target, basename) )
 
 
